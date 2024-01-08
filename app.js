@@ -5,9 +5,7 @@ const app = express()
 const PORT = process.env.PORT || 5000
 
 app.get('/health', (_req, res) => {
-  throw 'error...'
-  // eslint-disable-next-line no-unreachable
-  res.send('ok')
+  res.send("ok")
 })
 
 app.use(express.static('dist'))

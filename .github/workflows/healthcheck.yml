@@ -1,0 +1,31 @@
+name: Periodic health check
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  health_check:
+    runs-on: ubuntu-20.04
+    steps:
+      - name: Check the deployed service URL
+        uses: jtalk/url-health-check-action@v3
+        with:
+          url: https://full-stack-open-pokedex-luminous.fly.dev/health
+      - name: Notify on New Release
+        uses: rjstone/discord-webhook-notify@v1
+        if: ${{ success() }}
+        with:
+          severity: info
+          text: Health check succeeded!
+          description: "The app is live at https://full-stack-open-pokedex-luminous.fly.dev"
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
+      - name: Notify on Failure
+        uses: rjstone/discord-webhook-notify@v1
+        if: ${{ failure() }}
+        with:
+          severity: error
+          text: Build failed
+          description: "commit ${{github.event.head_commit.url}} by ${{github.triggering_actor}} broke the build :("
+          webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}

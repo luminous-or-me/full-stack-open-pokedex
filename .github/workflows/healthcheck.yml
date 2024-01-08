@@ -1,9 +1,8 @@
 name: Periodic health check
 
 on:
-  push:
-    branches:
-      - master
+  schedule:
+    - cron: '*/5 * * * *'
 
 jobs:
   health_check:
@@ -13,7 +12,7 @@ jobs:
         uses: jtalk/url-health-check-action@v3
         with:
           url: https://full-stack-open-pokedex-luminous.fly.dev/health
-      - name: Notify on New Release
+      - name: Notify on Health Check Success
         uses: rjstone/discord-webhook-notify@v1
         if: ${{ success() }}
         with:
@@ -26,6 +25,5 @@ jobs:
         if: ${{ failure() }}
         with:
           severity: error
-          text: Build failed
-          description: "commit ${{github.event.head_commit.url}} by ${{github.triggering_actor}} broke the build :("
+          text: Health check failed!
           webhookUrl: ${{ secrets.DISCORD_WEBHOOK }}
